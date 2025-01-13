@@ -69,3 +69,4 @@ void print_rawdata() {
     Serial.print(mpu.getMagScaleZ());     // Z축 자기장 스케일 출력
     Serial.println("");                   // 개행 문자 출력
 }
+//aaaa

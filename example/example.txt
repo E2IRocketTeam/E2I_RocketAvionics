@@ -1,0 +1,33 @@
+#include <Wire.h> //I2C 통신을 위한 헤더파일
+#include <MPU9250.h> //MPU-9250 센서를 제어하기 위한 헤더파일
+
+MPU9250 mpu; //센서를 제어하기 위한 객체 생성
+
+void setup() {
+  Serial.begin(9600); //시리얼 통신속도 설정
+  Wire.begin(); //I2C 통신 시작
+
+  if (!mpu.setup(0x68)) {  // MPU-9250 I2C 주소 
+    Serial.println("MPU-9250 초기화 실패!");
+    while (1);
+  }
+  Serial.println("MPU-9250 초기화 성공!");
+}
+
+void loop() {
+  if (mpu.update()) {
+    // 가속도 데이터 출력
+    Serial.print("가속도 X: "); Serial.println(mpu.getAccX());
+    Serial.print("가속도 Y: "); Serial.println(mpu.getAccY());
+    Serial.print("가속도 Z: "); Serial.println(mpu.getAccZ());
+
+    // 자이로 데이터 출력
+    Serial.print("자이로 X: "); Serial.println(mpu.getGyroX());
+    Serial.print("자이로 Y: "); Serial.println(mpu.getGyroY());
+    Serial.print("자이로 Z: "); Serial.println(mpu.getGyroZ());
+
+    // 2.5초 대기
+    delay(2500);
+  }
+}
+}

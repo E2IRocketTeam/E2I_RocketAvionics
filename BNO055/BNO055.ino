@@ -25,22 +25,22 @@ void setup() {
 }
 
 void loop() {
-  // 오일러 각도 (Yaw, Pitch, Roll) 읽기
-  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
 
-  Serial.print("Yaw: ");
-  Serial.print(euler.x());
-  Serial.print(" Pitch: ");
-  Serial.print(euler.y());
-  Serial.print(" Roll: ");
-  Serial.println(euler.z());
+imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+
+Serial.print("Yaw: ");
+Serial.print(euler.x());
+Serial.print(" Pitch: ");
+Serial.print(euler.y());
+Serial.print(" Roll: ");
+Serial.println(euler.z());
 
   // 온도 출력
-  int8_t temp = bno.getTemp();
-  Serial.print("온도: ");
-  Serial.print(temp);
-  Serial.println(" °C");
+int8_t temp = bno.getTemp();
+Serial.print("온도: ");
+Serial.print(temp);
+Serial.println(" °C");
 
   // 딜레이
-  delay(1000);
+delay(1000);
 }

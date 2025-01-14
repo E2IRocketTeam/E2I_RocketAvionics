@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
+#pip install numpy matplotlib pyserial
 
 # 시리얼 포트 설정 (IMU와 연결)
 SERIAL_PORT = 'COM3'  # IMU 연결 포트

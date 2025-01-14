@@ -10,7 +10,7 @@ SERIAL_PORT = 'COM3'  # IMU 연결 포트
 BAUD_RATE = 9600
 
 # 시리얼 통신 초기화
-#ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 
 # 3D 시각화 초기화
 fig = plt.figure()
@@ -26,7 +26,9 @@ ax.set_zlim([-1, 1])
 
 # 축 초기화
 vector_line, = ax.plot([0, 1], [0, 0], [0, 0], 'r', label="X-axis")
-ax.quiver(0, 0, 0, 1, 0, 0, color='r', label='Orientation')
+ax.quiver(0, 0, 0, 1, 0, 0, color='r', label='Orientation X')  # X direction
+ax.quiver(0, 0, 0, 0, 1, 0, color='g', label='Orientation Y')  # Y direction
+ax.quiver(0, 0, 0, 0, 0, 1, color='b', label='Orientation Z')  # Z direction
 
 # 데이터 업데이트 함수
 def update(frame):

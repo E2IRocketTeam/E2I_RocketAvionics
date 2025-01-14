@@ -7,14 +7,19 @@ from matplotlib.animation import FuncAnimation
 
 # 시리얼 포트 설정 (IMU와 연결)
 SERIAL_PORT = 'COM3'  # IMU 연결 포트
-BAUD_RATE = 115200
+BAUD_RATE = 9600
 
 # 시리얼 통신 초기화
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
+#ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 
 # 3D 시각화 초기화
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
+
+ax.set_xlabel("X (m)")
+ax.set_ylabel("Y (m)")
+ax.set_zlabel("Z (m)")
+
 ax.set_xlim([-1, 1])
 ax.set_ylim([-1, 1])
 ax.set_zlim([-1, 1])

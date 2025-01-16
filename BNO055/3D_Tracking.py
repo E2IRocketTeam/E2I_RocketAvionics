@@ -6,11 +6,11 @@ from matplotlib.animation import FuncAnimation
 #pip install numpy matplotlib pyserial
 
 # 시리얼 포트 설정 (IMU와 연결)
-SERIAL_PORT = 'COM3'  # IMU 연결 포트
+SERIAL_PORT = 'COM7'  # IMU 연결 포트
 BAUD_RATE = 9600
 
 # 시리얼 통신 초기화
-#ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 
 # 3D 시각화 초기화
 fig = plt.figure()

@@ -12,26 +12,28 @@ void setup() {
 
   Serial.println("BNO055 테스트 시작!");
 
+  // 센서 초기화
   if (!bno.begin()) {
     Serial.println("BNO055 초기화 실패... 확인 필요!");
     while (1);
   }
   delay(1000);
 
+  // 센서 보정 정보 출력
   bno.setExtCrystalUse(true);
   Serial.println("BNO055 초기화 완료");
 }
 
 void loop() {
+  // Euler 각도(Yaw, Pitch, Roll) 읽기
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  int8_t temp = bno.getTemp();
 
-  // 데이터를 CSV 형식으로 전송
-  Serial.print(euler.x());
+  Serial.print(euler.x(), 2); // Yaw
   Serial.print(",");
-  Serial.print(euler.y());
+  Serial.print(euler.y(), 2); // Pitch
   Serial.print(",");
-  Serial.print(euler.z());
-  Serial.print(",");
-  Serial.println(temp);
+  Serial.println(euler.z(), 2); // Roll
+
+  // 딜레이
+  delay(10); // 10ms 주기 (100Hz)
 }

@@ -3,10 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
-#pip install numpy matplotlib pyserial
 
 # 시리얼 포트 설정 (IMU와 연결)
-SERIAL_PORT = 'COM7'  # IMU 연결 포트
+SERIAL_PORT = 'COM6'  # IMU 연결 포트
 BAUD_RATE = 9600
 
 # 시리얼 통신 초기화
@@ -26,9 +25,11 @@ ax.set_zlim([-1, 1])
 
 # 축 초기화
 vector_line, = ax.plot([0, 1], [0, 0], [0, 0], 'r', label="X-axis")
-ax.quiver(0, 0, 0, 1, 0, 0, color='r', label='Orientation X')  # X direction
-ax.quiver(0, 0, 0, 0, 1, 0, color='g', label='Orientation Y')  # Y direction
-ax.quiver(0, 0, 0, 0, 0, 1, color='b', label='Orientation Z')  # Z direction
+orientation_vectors = {
+    'x': ax.quiver(0, 0, 0, 1, 0, 0, color='r', label='Orientation X'),
+    'y': ax.quiver(0, 0, 0, 0, 1, 0, color='g', label='Orientation Y'),
+    'z': ax.quiver(0, 0, 0, 0, 0, 1, color='b', label='Orientation Z')
+}
 
 # 데이터 업데이트 함수
 def update(frame):
@@ -59,8 +60,20 @@ def update(frame):
 
         # 새 방향 벡터 계산
         x_dir = R @ np.array([1, 0, 0])
+        y_dir = R @ np.array([0, 1, 0])
+        z_dir = R @ np.array([0, 0, 1])
+
+        # 방향 벡터 업데이트
         vector_line.set_data([0, x_dir[0]], [0, x_dir[1]])
         vector_line.set_3d_properties([0, x_dir[2]])
+
+        orientation_vectors['x'].remove()
+        orientation_vectors['y'].remove()
+        orientation_vectors['z'].remove()
+
+        orientation_vectors['x'] = ax.quiver(0, 0, 0, x_dir[0], x_dir[1], x_dir[2], color='r')
+        orientation_vectors['y'] = ax.quiver(0, 0, 0, y_dir[0], y_dir[1], y_dir[2], color='g')
+        orientation_vectors['z'] = ax.quiver(0, 0, 0, z_dir[0], z_dir[1], z_dir[2], color='b')
 
     except ValueError:
         print("잘못된 데이터: ", line)

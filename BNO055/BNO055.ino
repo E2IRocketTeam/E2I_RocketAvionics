@@ -12,35 +12,26 @@ void setup() {
 
   Serial.println("BNO055 테스트 시작!");
 
-  // 센서 초기화
   if (!bno.begin()) {
-    Serial.print("BNO055 초기화 실패... 확인 필요!");
+    Serial.println("BNO055 초기화 실패... 확인 필요!");
     while (1);
   }
   delay(1000);
 
-  // 센서 보정 정보 출력
   bno.setExtCrystalUse(true);
   Serial.println("BNO055 초기화 완료");
 }
 
 void loop() {
+  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+  int8_t temp = bno.getTemp();
 
-imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-
-Serial.print("Yaw: ");
-Serial.print(euler.x());
-Serial.print(" Pitch: ");
-Serial.print(euler.y());
-Serial.print(" Roll: ");
-Serial.println(euler.z());
-
-  // 온도 출력
-int8_t temp = bno.getTemp();
-Serial.print("온도: ");
-Serial.print(temp);
-Serial.println(" °C");
-
-  // 딜레이
-delay(1000);
+  // 데이터를 CSV 형식으로 전송
+  Serial.print(euler.x());
+  Serial.print(",");
+  Serial.print(euler.y());
+  Serial.print(",");
+  Serial.print(euler.z());
+  Serial.print(",");
+  Serial.println(temp);
 }

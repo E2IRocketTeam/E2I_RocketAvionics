@@ -96,3 +96,4 @@ ax = fig.add_subplot(111, projection='3d')
 ani = FuncAnimation(fig, update, interval=10)  # Update every 10ms
 
 plt.show()
+

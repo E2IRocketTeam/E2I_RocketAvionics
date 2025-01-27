@@ -3,6 +3,7 @@
 
 #include <SD.h>
 
+
 // SD 카드 칩 선택 핀 설정 (Teensy 4.1 내장 SD는 BUILTIN_SDCARD 사용)
 const int chipSelect = BUILTIN_SDCARD;
 

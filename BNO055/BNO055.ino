@@ -62,18 +62,18 @@ void loop() {
   Serial.print(",");
   Serial.println(euler.z(), 2); // Roll
 
-  // SD 카드에 데이터 저장
-  dataFile = SD.open("datalog.csv", FILE_WRITE);
-  if (dataFile) {
-    dataFile.print(yaw, 2);
-    dataFile.print(",");
-    dataFile.print(pitch, 2);
-    dataFile.print(",");
-    dataFile.println(roll, 2);
-    dataFile.close();
-  } else {
-    Serial.println("파일 열기 실패!");
-  }
+  // // SD 카드에 데이터 저장
+  // dataFile = SD.open("datalog.csv", FILE_WRITE);
+  // if (dataFile) {
+  //   dataFile.print(yaw, 2);
+  //   dataFile.print(",");
+  //   dataFile.print(pitch, 2);
+  //   dataFile.print(",");
+  //   dataFile.println(roll, 2);
+  //   dataFile.close();
+  // } else {
+  //   Serial.println("파일 열기 실패!");
+  // }
 
   // 딜레이
   delay(10); // 10ms 주기 (100Hz)

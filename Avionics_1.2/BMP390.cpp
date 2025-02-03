@@ -1,9 +1,9 @@
 #include "BMP390.h"
 
-BMP390::BMP390(uint8_t addr) : address(addr), temperature(0.0), pressure(0.0), altitude(0.0) {}
+BMP390::BMP390() {}
 
 bool BMP390::begin() {
-    if (!bmp.begin_I2C(address)) {
+    if (!bmp.begin_I2C()) {
         return false;
     }
     bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
@@ -12,26 +12,10 @@ bool BMP390::begin() {
     return true;
 }
 
-void BMP390::readSensorData() {
+void BMP390::readData(float &temperature, float &pressure, float &altitude) {
     if (bmp.performReading()) {
         temperature = bmp.temperature;
         pressure = bmp.pressure / 100.0;
-        altitude = bmp.readAltitude(1013.25);
+        altitude = bmp.readAltitude(SEALEVELPRESSURE_HPA);
     }
-}
-
-float BMP390::readTemperature() {
-    return temperature;
-}
-
-float BMP390::readPressure() {
-    return pressure;
-}
-
-float BMP390::readAltitude(float seaLevelPressure) {
-    return bmp.readAltitude(seaLevelPressure);
-}
-
-bool BMP390::logSensorData(const char* filename) {
-    return logData(filename, 0.0, 0.0, 0.0, temperature, pressure, altitude);
 }

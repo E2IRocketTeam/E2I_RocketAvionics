@@ -8,14 +8,13 @@ BMP390 bmpSensor;
 BNO055 bnoSensor;
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     while (!Serial);
 
     if (!initializeSD()) {
         Serial.println("SD card initialization failed!");
         while (1);
     }
-    Serial.println("SD card initialized.");
 
     if (!bmpSensor.begin()) {
         Serial.println("BMP390 initialization failed!");

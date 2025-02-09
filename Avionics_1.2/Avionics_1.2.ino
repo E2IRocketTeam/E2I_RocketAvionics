@@ -11,7 +11,7 @@ BMP390 bmpSensor;
 BNO055 bnoSensor;
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     while (!Serial);
 
     if (!initializeSD()) {
@@ -45,12 +45,14 @@ void loop() {
     parachute.update();
     
     if (logData(filename, yaw, pitch, roll, temperature, pressure, altitude)) {
+        Serial.print("Logged Data: ");  // "Logged Data:" 뒤에 공백 추가
         Serial.print(yaw, 2); Serial.print(", ");
         Serial.print(pitch, 2); Serial.print(", ");
         Serial.print(roll, 2); Serial.print(", ");
         Serial.print(temperature, 2); Serial.print(", ");
         Serial.print(pressure, 2); Serial.print(", ");
-        Serial.println(altitude, 2);
+        Serial.println(altitude, 2);  // 마지막은 Serial.println() 사용
+
     } else {
         Serial.println("Failed to log data");
     }

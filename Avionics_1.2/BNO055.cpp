@@ -24,3 +24,6 @@ void BNO055::getEulerAngles(float &yaw, float &pitch, float &roll) {
     pitch = euler.y();
     roll = euler.z();
 }
+
+
+

@@ -23,14 +23,12 @@ void Parachute::update() {
 
     // 서보모터 동작 조건
     if (abs(pitch - 90) >= thresholdAngle) {
-        Serial.println("🚨 ±45도 이상 감지! 서보모터 90도 이동 🚨");
+        
         servoMotor.write(90);
     } else {
-        Serial.println("✅ 정상 범위, 서보모터 0도 유지 ✅");
+        
         servoMotor.write(0);
     }
-
-    delay(100);
 }
 
 // BNO055 센서 값을 외부에서 가져올 수 있도록 추가

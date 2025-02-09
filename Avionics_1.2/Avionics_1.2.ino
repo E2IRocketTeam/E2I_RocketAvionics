@@ -2,15 +2,16 @@
 #include "Sdcard.h"
 #include "BMP390.h"
 #include "BNO055.h"
-#include <Servo.h>
+#include "Parachute.h"
 
+Parachute parachute(9);
 
 const char* filename = "sensor_data.csv";
 BMP390 bmpSensor;
 BNO055 bnoSensor;
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     while (!Serial);
 
     if (!initializeSD()) {
@@ -32,8 +33,7 @@ void setup() {
         Serial.println("Failed to create log file!");
         while (1);
     }
-    parachuteServo.attach(9); // 서보 모터 핀 (PWM 핀 사용)
-    parachuteServo.write(0);  // 초기 위치 (낙하산 닫힘)
+    parachute.begin();
 }
 
 void loop() {
@@ -42,13 +42,8 @@ void loop() {
 
     bmpSensor.readData(temperature, pressure, altitude);
     bnoSensor.readData(yaw, pitch, roll);
-
-    if(pitch >= 45 && pitch <= 50) {
-        Serial.println("🚀 낙하산 전개!");
-        parachuteServo.write(90); // 90도 회전 (서보 모터가 낙하산을 전개하도록 설정)
-    }
-
-
+    parachute.update();
+    
     if (logData(filename, yaw, pitch, roll, temperature, pressure, altitude)) {
         Serial.print(yaw, 2); Serial.print(", ");
         Serial.print(pitch, 2); Serial.print(", ");

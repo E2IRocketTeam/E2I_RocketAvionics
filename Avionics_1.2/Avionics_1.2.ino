@@ -13,38 +13,33 @@
 Parachute parachute(9);
 
 const char* filename = "sensor_data.csv";
-LoRaSender LoRa(RFM95_CS, RFM95_RST, RFM95_INT, RF95_FREQ);
+//LoRaSender LoRa(RFM95_CS, RFM95_RST, RFM95_INT, RF95_FREQ);
 BMP390 bmpSensor;
 BNO055 bnoSensor;
 
 void setup() {
-    Serial.begin(115200);
-    while (!Serial);
+    delay(100);  // SD 카드 안정성을 위해 초기 지연 추가
 
     if (!initializeSD()) {
-        Serial.println("SD card 모듈 초기화 실패");
-        while (1);
+        while (1);  // SD 카드 초기화 실패 시 멈춤
     }
 
     if (!bmpSensor.begin()) {
-        Serial.println("BMP390 모듈 초기화 실패");
-        while (1);
+        while (1);  // BMP390 센서 초기화 실패 시 멈춤
     }
 
     if (!bnoSensor.begin()) {
-        Serial.println("BNO055 모듈 초기화 실패");
-        while (1);
+        while (1);  // BNO055 센서 초기화 실패 시 멈춤
     }
 
     if (!createLogFile(filename)) {
-        Serial.println("Failed to create log file!");
-        while (1);
+        while (1);  // 로그 파일 생성 실패 시 멈춤
     }
 
-    if (!loRa.begin()) {
-        Serial.println("LoRa 모듈 초기화 실패");
-        while (1);
-    }
+    // if (!LoRa.begin()) {
+    //     while (1);  // LoRa 모듈 초기화 실패 시 멈춤
+    // }
+
     parachute.begin();
 }
 
@@ -56,17 +51,6 @@ void loop() {
     bnoSensor.readData(yaw, pitch, roll);
     parachute.update();
     
-    if (logData(filename, yaw, pitch, roll, temperature, pressure, altitude)) {
-        Serial.print("Logged Data: ");  // "Logged Data:" 뒤에 공백 추가
-        Serial.print(yaw, 2); Serial.print(", ");
-        Serial.print(pitch, 2); Serial.print(", ");
-        Serial.print(roll, 2); Serial.print(", ");
-        Serial.print(temperature, 2); Serial.print(", ");
-        Serial.print(pressure, 2); Serial.print(", ");
-        Serial.println(altitude, 2);  // 마지막은 Serial.println() 사용
-
-    } else {
-        Serial.println("Failed to log data");
-    }
-    LoRa.sendData(yaw, pitch, roll, temperature, pressure, altitude);
+    logData(filename, yaw, pitch, roll, temperature, pressure, altitude);
+    //LoRa.sendData(yaw, pitch, roll, temperature, pressure, altitude);
 }

@@ -27,7 +27,7 @@ bool LoRaSender::begin() {
     Serial.print("📡 주파수 설정: ");
     Serial.print(frequency);
     Serial.println(" MHz");
-
+    
     rf95.setTxPower(23, false);
     return true;
 }

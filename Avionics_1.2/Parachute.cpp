@@ -23,12 +23,22 @@ void Parachute::update() {
 
     // 서보모터 동작 조건
     if (abs(pitch - 90) >= thresholdAngle) {
-        
-        servoMotor.write(90);
+        openParachute();  // 서보모터를 90도로 설정 (열기)
     } else {
-        
-        servoMotor.write(0);
+        closeParachute(); // 서보모터를 0도로 설정 (닫기)
     }
+}
+
+// 서보모터를 열기 (90도)
+void Parachute::openParachute() {
+    
+    servoMotor.write(90);
+}
+
+// 서보모터를 닫기 (0도)
+void Parachute::closeParachute() {
+    
+    servoMotor.write(0);
 }
 
 // BNO055 센서 값을 외부에서 가져올 수 있도록 추가

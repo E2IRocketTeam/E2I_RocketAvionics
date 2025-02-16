@@ -3,8 +3,9 @@
 #include "BMP390.h"
 #include "BNO055.h"
 #include "Parachute.h"
-#include "LoRaSender.h"
 #include "Kalman.h"  
+
+
 
 #define RFM95_CS 10
 #define RFM95_RST 9
@@ -46,10 +47,6 @@ void setup() {
         Serial.println("로그 파일 생성 실패!");
         while (1);
     }
-
-    // if (!LoRa.begin()) {
-    //     while (1);
-    // }
 
     parachute.begin();
 

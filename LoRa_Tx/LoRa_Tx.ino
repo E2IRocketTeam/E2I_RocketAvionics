@@ -1,7 +1,7 @@
 #define LORA Serial2  // Serial2 사용 (TX=8, RX=7)
 
 void setup() {
-    Serial.begin(9600);  // PC와 연결된 USB 시리얼 모니터
+    Serial.begin(115200);  // PC와 연결된 USB 시리얼 모니터
     LORA.begin(9600);    // LoRa 모듈과 통신할 Serial2 시작
 
     delay(500);

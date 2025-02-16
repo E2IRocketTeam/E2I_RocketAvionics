@@ -1,7 +1,7 @@
 #include "ForcedParachute.h"
 #include <Arduino.h>
 
-ForcedParachute::ForcedParachute(int servoPin) : servoPin(servoPin) {}
+ForcedParachute::Parachute() : sensor(0x28) {}
 
 void ForcedParachute::begin() {
     Serial.begin(9600);

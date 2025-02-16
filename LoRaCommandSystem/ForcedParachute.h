@@ -6,15 +6,15 @@
 
 class ForcedParachute {
 public:
-    ForcedParachute(int servoPin);
-
+    ForcedParachute(); // 
+    
     void begin();
     void openParachute();  // 낙하산 개방
     void closeParachute(); // 낙하산 닫기
 
 private:
     Servo servoMotor;
-    int servoPin;
+    const int servoPin = 9; 
 };
 
 #endif

@@ -14,7 +14,7 @@ public:
 
 private:
     Servo servoMotor;
-    int servoPin;
+    int servoPin = 9;
 };
 
 #endif

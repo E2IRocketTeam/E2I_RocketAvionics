@@ -6,13 +6,12 @@
 #include "Kalman.h"  
 
 
-
 #define RFM95_CS 10
 #define RFM95_RST 9
 #define RFM95_INT 2
 #define RF95_FREQ 920.9  // 주파수 920.9 MHz
 
-Parachute parachute(9);
+Parachute parachute;
 const char* filename = "sensor_data.csv";
 //LoRaSender LoRa(RFM95_CS, RFM95_RST, RFM95_INT, RF95_FREQ);
 BMP390 bmpSensor;

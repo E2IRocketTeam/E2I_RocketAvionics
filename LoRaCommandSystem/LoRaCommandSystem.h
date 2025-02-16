@@ -1,25 +1,23 @@
 #ifndef LORA_COMMAND_SYSTEM_H
 #define LORA_COMMAND_SYSTEM_H
 
-#include <Arduino.h>
-#include "ForcedParachute.h"
+#include "Parachute.h"
 
-// 명령어 정의
+#define LORA Serial2 // Serial2 사용 (TX=8, RX=7)
+
 #define PARACHUTE_OPEN_KEY "OP"
 #define PARACHUTE_CLOSE_KEY "CP"
 #define RESET_KEY "R"
 
 class LoRaCommandSystem {
 public:
-    LoRaCommandSystem(Stream &loraStream, ForcedParachute &parachute);
+    LoRaCommandSystem(int parachutePin);
     void begin();
     void processCommands();
-
-private:
     void softwareReset();
 
-    Stream &loraStream;         // LoRa 통신을 위한 Stream 객체 참조
-    ForcedParachute &parachute; // ForcedParachute 객체 참조
+private:
+    Parachute parachute;
 };
 
-#endif
+#endif // LORA_COMMAND_SYSTEM_H

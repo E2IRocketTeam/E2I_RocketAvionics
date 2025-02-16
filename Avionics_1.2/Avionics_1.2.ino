@@ -6,12 +6,16 @@
 #include "Kalman.h"  
 
 
-#define RFM95_CS 10
-#define RFM95_RST 9
-#define RFM95_INT 2
-#define RF95_FREQ 920.9  // 주파수 920.9 MHz
+// #define RFM95_CS 10
+// #define RFM95_RST 9
+// #define RFM95_INT 2
+// #define RF95_FREQ 920.9  // 주파수 920.9 MHz
 
-Parachute parachute;
+
+#define LORA Serial2
+
+Parachute parachute1(9);
+
 const char* filename = "sensor_data.csv";
 //LoRaSender LoRa(RFM95_CS, RFM95_RST, RFM95_INT, RF95_FREQ);
 BMP390 bmpSensor;
@@ -47,7 +51,7 @@ void setup() {
         while (1);
     }
 
-    parachute.begin();
+    parachute1.begin();
 
     // 센서에서 초기 각도값 읽어 칼만 필터 초기값 설정
     float initYaw, initPitch, initRoll;
@@ -64,12 +68,11 @@ void setup() {
 void loop() {
     float temperature, pressure, altitude;
     float rawYaw, rawPitch, rawRoll;
-
     // BMP390 센서 데이터 읽기
     bmpSensor.readData(temperature, pressure, altitude);
     // BNO055 센서 데이터 읽기 (원본 각도값)
     bnoSensor.readData(rawYaw, rawPitch, rawRoll);
-    parachute.update();
+    parachute1.update();
 
     // 시간 차이 계산 (초 단위)
     unsigned long currentTime = millis();

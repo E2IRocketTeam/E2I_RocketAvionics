@@ -1,0 +1,3 @@
+    ESP8266	    Teensy4.1
+TX	tx	        1
+RX	rx	        0

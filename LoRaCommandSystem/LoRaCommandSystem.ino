@@ -1,13 +1,9 @@
-#include "Parachute.h"
-
 
 #define LORA Serial2  // Serial2 사용 (TX=8, RX=7)
 
 #define PARACHUTE_OPEN_KEY "OP"
 #define PARACHUTE_CLOSE_KEY "CP"
 #define RESET_KEY "R"
-
-Parachute parachute(9); // 서보모터 9번 핀 사용
 
 void setup() {
     parachute.begin();
@@ -25,10 +21,10 @@ void loop() {
         String receivedData = LORA.readString();
         
         if(receivedData ==  PARACHUTE_OPEN_KEY) {
-            parachute.openParachute();
+            //parachute.openParachute();
         }
         else if(receivedData ==  PARACHUTE_CLOSE_KEY) {
-            parachute.closeParachute();
+            //parachute.closeParachute();
         }
         else if(receivedData ==  RESET_KEY) {
             softwareReset(); 

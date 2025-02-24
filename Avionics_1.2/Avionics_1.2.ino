@@ -12,17 +12,13 @@
 #define RFM95_INT 2
 #define RF95_FREQ 915.0 // 주파수 (모듈에 맞게 설정)
 
-// LoRa 객체 생성
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 const char* filename = "sensor_data.csv";
 BMP390 bmpSensor;
 BNO055 bnoSensor;
 
-// yaw, pitch, roll 각각에 대해 칼만 필터 객체 생성
 Kalman kalmanYaw, kalmanPitch, kalmanRoll;
-
-// dt 계산을 위한 시간 변수
 unsigned long previousTime = 0;
 
 void setup() {
@@ -50,7 +46,9 @@ void setup() {
     }
     Serial.print("LoRa 주파수 설정 완료: "); Serial.println(RF95_FREQ);
 
-    rf95.setTxPower(13, false);  // 송신 출력 설정 (기본값 13dBm)
+    // LoRa 모듈 파라미터 최적화
+
+    rf95.setTxPower(23, false);  // 송신 전력 최대 설정 (23dBm)
 
     // SD 카드 초기화
     if (!initializeSD()) {
@@ -74,7 +72,6 @@ void setup() {
         while (1);
     }
 
-    // 센서에서 초기 각도값 읽어 칼만 필터 초기값 설정
     float initYaw, initPitch, initRoll;
     bnoSensor.readData(initYaw, initPitch, initRoll);
     kalmanYaw.setAngle(initYaw);
@@ -96,12 +93,11 @@ void loop() {
     // BNO055 센서 데이터 읽기 (원본 각도값)
     bnoSensor.readData(rawYaw, rawPitch, rawRoll);
 
-    // 시간 차이 계산 (초 단위)
     unsigned long currentTime = millis();
     float dt = (currentTime - previousTime) / 1000.0f;
     previousTime = currentTime;
 
-    // 칼만 필터 적용 (gyro 데이터가 없는 경우 0 사용)
+    // 칼만 필터 적용
     float filteredYaw = kalmanYaw.getAngle(rawYaw, 0, dt);
     float filteredPitch = kalmanPitch.getAngle(rawPitch, 0, dt);
     float filteredRoll = kalmanRoll.getAngle(rawRoll, 0, dt);
@@ -117,23 +113,22 @@ void loop() {
     Serial.print(pressure); Serial.print(", ");
     Serial.println(altitude);
 
-    // 🔥 LoRa로 데이터 전송 (CSV 형식)
-    char message[100];
+    // LoRa로 데이터 전송 (CSV 형식)
+    char message[50]; // 작은 크기의 메시지를 사용
     snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
              filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
 
-    Serial.print("Sending: ");
+    // 송신 간격을 최소화하기 위해 1ms마다 송신
     Serial.println(message);
 
     rf95.send((uint8_t *)message, strlen(message) + 1);
 
-    // waitPacketSent() 타임아웃 추가
+    // 송신 대기 시간 최소화
     unsigned long startTime = millis();
     while (!rf95.waitPacketSent()) {
-        if (millis() - startTime > 2000) { // 2초 이상 대기하면 타임아웃
-            Serial.println("LoRa 송신 실패! (타임아웃)");
+        if (millis() - startTime > 50) { // 50ms 이상 대기하지 않도록
+            Serial.println("❌ 송신 실패! (타임아웃)");
             return;
         }
     }
-
 }

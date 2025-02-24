@@ -4,7 +4,7 @@
 #include "Sdcard.h"
 #include "BMP390.h"
 #include "BNO055.h"
-#include "Parachute.h"
+
 #include "Kalman.h"
 
 // RFM95W 핀 정의
@@ -13,9 +13,9 @@
 #define RFM95_INT 2
 #define RF95_FREQ 915.0 // 주파수 (모듈에 맞게 설정)
 
-RH_RF95 rf95(RFM95_CS, RFM95_INT); // RFM95 객체 생성
+//RH_RF95 rf95(RFM95_CS, RFM95_INT); // RFM95 객체 생성
 
-Parachute parachute1(9);
+
 const char* filename = "sensor_data.csv";
 BMP390 bmpSensor;
 BNO055 bnoSensor;
@@ -31,24 +31,24 @@ void setup() {
     delay(100);           // 초기 안정성을 위한 지연
 
     // LoRa 초기화
-    pinMode(RFM95_RST, OUTPUT);
-    digitalWrite(RFM95_RST, HIGH);
-    delay(10);
-    digitalWrite(RFM95_RST, LOW); // RFM95W 리셋
-    delay(10);
-    digitalWrite(RFM95_RST, HIGH);
-    delay(10);
+    // pinMode(RFM95_RST, OUTPUT);
+    // digitalWrite(RFM95_RST, HIGH);
+    // delay(10);
+    // digitalWrite(RFM95_RST, LOW); // RFM95W 리셋
+    // delay(10);
+    // digitalWrite(RFM95_RST, HIGH);
+    // delay(10);
 
-    if (!rf95.init()) {
-        Serial.println("RFM95W 초기화 실패!");
-        while (1);
-    }
+    // if (!rf95.init()) {
+    //     Serial.println("RFM95W 초기화 실패!");
+    //     while (1);
+    // }
 
-    if (!rf95.setFrequency(RF95_FREQ)) {
-        Serial.println("LoRa 주파수 설정 실패!");
-        while (1);
-    }
-    rf95.setTxPower(23, false); // 출력 전력 설정
+    // if (!rf95.setFrequency(RF95_FREQ)) {
+    //     Serial.println("LoRa 주파수 설정 실패!");
+    //     while (1);
+    // }
+    // rf95.setTxPower(23, false); // 출력 전력 설정
 
     // SD 카드 초기화
     if (!initializeSD()) {
@@ -72,7 +72,7 @@ void setup() {
         while (1);
     }
 
-    parachute1.begin();
+
 
     // 센서에서 초기 각도값 읽어 칼만 필터 초기값 설정
     float initYaw, initPitch, initRoll;
@@ -96,7 +96,7 @@ void loop() {
     // BNO055 센서 데이터 읽기 (원본 각도값)
     bnoSensor.readData(rawYaw, rawPitch, rawRoll);
 
-    parachute1.update();
+
 
     // 시간 차이 계산 (초 단위)
     unsigned long currentTime = millis();
@@ -120,16 +120,16 @@ void loop() {
     Serial.println(altitude);
 
     // LoRa로 데이터 전송
-    sendLoRaData(filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
+    //sendLoRaData(filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
 }
 
 // LoRa 데이터를 송신하는 함수
-void sendLoRaData(float yaw, float pitch, float roll, float temperature, float pressure, float altitude) {
-    char message[100];
-    snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
-             yaw, pitch, roll, temperature, pressure, altitude);
+// void sendLoRaData(float yaw, float pitch, float roll, float temperature, float pressure, float altitude) {
+//     char message[100];
+//     snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+//              yaw, pitch, roll, temperature, pressure, altitude);
 
-    rf95.send((uint8_t*)message, strlen(message)); // LoRa 데이터 송신
-    rf95.waitPacketSent();                         // 패킷 송신 완료 대기
-    Serial.println("LoRa 데이터 전송 완료: " + String(message));
-}
+//     rf95.send((uint8_t*)message, strlen(message)); // LoRa 데이터 송신
+//     rf95.waitPacketSent();                         // 패킷 송신 완료 대기
+//     Serial.println("LoRa 데이터 전송 완료: " + String(message));
+// }

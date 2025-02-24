@@ -21,16 +21,9 @@ void setup()
   digitalWrite(RFM95_RST, HIGH);
 
   while (!Serial);
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(100);
 
-  Serial.println("LoRa Receiver Starting...");
-
-  // RFM95 초기화
-  digitalWrite(RFM95_RST, LOW);
-  delay(10);
-  digitalWrite(RFM95_RST, HIGH);
-  delay(10);
 
   if (!rf95.init()) {
     Serial.println("LoRa radio init failed");
@@ -59,13 +52,8 @@ void loop()
 
     // 메시지 수신
     if (rf95.recv(buf, &len)) {
-      digitalWrite(LED, HIGH);
-      Serial.print("Received: ");
       Serial.write(buf, len);
-      Serial.println();
-      Serial.print("RSSI: ");
-      Serial.println(rf95.lastRssi(), DEC);
-      digitalWrite(LED, LOW);
+
     } else {
       Serial.println("Receive failed");
     }

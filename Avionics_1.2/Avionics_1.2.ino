@@ -131,7 +131,7 @@ void loop() {
     unsigned long startTime = millis();
     while (!rf95.waitPacketSent()) {
         if (millis() - startTime > 2000) { // 2초 이상 대기하면 타임아웃
-            Serial.println("❌ LoRa 송신 실패! (타임아웃)");
+            Serial.println("LoRa 송신 실패! (타임아웃)");
             return;
         }
     }

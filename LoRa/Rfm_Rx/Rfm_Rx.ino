@@ -40,7 +40,7 @@ void setup()
   Serial.println(RF95_FREQ);
 
   // 송신 전력 설정 (기본값은 13dBm)
-  rf95.setTxPower(13, false);
+  rf95.setTxPower(23, false);
 }
 
 void loop()

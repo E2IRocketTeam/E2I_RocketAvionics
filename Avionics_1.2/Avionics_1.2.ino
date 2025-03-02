@@ -12,6 +12,7 @@
 #define RFM95_INT 2
 #define RF95_FREQ 915.0 // 주파수 (모듈에 맞게 설정)
 
+
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 const char* filename = "sensor_data.csv";
@@ -25,7 +26,7 @@ void setup() {
     Serial.begin(115200);
     delay(100);
 
-    // LoRa 초기화
+    // LoRa 초기화 RFM
     pinMode(RFM95_RST, OUTPUT);
     digitalWrite(RFM95_RST, HIGH);
 
@@ -33,6 +34,18 @@ void setup() {
     delay(100);
     digitalWrite(RFM95_RST, HIGH);
     delay(100);
+
+    // LoRa 초기화 RYLR896
+    Serial1.begin(115200); 
+    Serial1.println("AT");                // 모듈 응답 확인
+    delay(50);
+    Serial1.println("AT+ADDRESS=2");        // 수신기 주소 설정 (송신기와 맞춰야 함)
+    delay(50);
+    Serial1.println("AT+NETWORKID=5");      // 네트워크 ID 설정 (송신기와 동일)
+    delay(50);
+    Serial1.println("AT+BAND=868000000");   // 주파수 설정 (예: 868MHz)
+    delay(50);
+
 
     if (!rf95.init()) {
         Serial.println("LoRa 모듈 초기화 실패!");
@@ -113,6 +126,13 @@ void loop() {
     Serial.print(pressure); Serial.print(", ");
     Serial.println(altitude);
 
+    if (Serial1.available()) {
+        // 개행 문자('\n')까지 읽어서 문자열 생성
+        String receivedMessage = Serial1.readStringUntil('\n');
+        Serial.print("수신: ");
+        Serial.println(receivedMessage);
+      }
+      
     // LoRa로 데이터 전송 (CSV 형식)
     char message[50]; // 작은 크기의 메시지를 사용
     snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
@@ -127,7 +147,7 @@ void loop() {
     unsigned long startTime = millis();
     while (!rf95.waitPacketSent()) {
         if (millis() - startTime > 50) { // 50ms 이상 대기하지 않도록
-            Serial.println("❌ 송신 실패! (타임아웃)");
+            Serial.println("송신 실패!");
             return;
         }
     }

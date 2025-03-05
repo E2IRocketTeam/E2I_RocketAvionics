@@ -35,3 +35,4 @@ float BMP390::readAltitude(float seaLevelPressure) {
 bool BMP390::logSensorData(const char* filename) {
     return logData(filename, 0.0, 0.0, 0.0, temperature, pressure, altitude);
 }
+//연습

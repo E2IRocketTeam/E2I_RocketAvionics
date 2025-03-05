@@ -4,7 +4,7 @@ import matplotlib.animation as animation
 from collections import deque
 
 # 시리얼 포트 설정
-SERIAL_PORT = 'COM3'  # Raspberry Pi에서는 '/dev/ttyUSB0' 등으로 변경
+SERIAL_PORT = 'COM6'  # Raspberry Pi에서는 '/dev/ttyUSB0' 등으로 변경
 BAUD_RATE = 115200
 
 # 그래프 데이터 저장용 큐 (최근 100개 데이터 저장)
@@ -15,7 +15,7 @@ data = {
 }
 
 # 시리얼 포트 열기
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.005)
 
 # 그래프 업데이트 함수
 def update(frame):

@@ -119,12 +119,15 @@ void loop() {
     logData(filename, filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
 
     // 시리얼 모니터에 데이터 출력
-    Serial.print(filteredYaw); Serial.print(", ");
-    Serial.print(filteredPitch); Serial.print(", ");
-    Serial.print(filteredRoll); Serial.print(", ");
-    Serial.print(temperature); Serial.print(", ");
-    Serial.print(pressure); Serial.print(", ");
-    Serial.println(altitude);
+    Serial.print("Yaw: "); Serial.print(filteredYaw);
+    Serial.print(", Pitch: "); Serial.print(filteredPitch);
+    Serial.print(", Roll: "); Serial.println(filteredRoll);
+    
+    Serial.print("온도: "); Serial.print(temperature);
+    Serial.print(", 기압: "); Serial.print(pressure);
+    Serial.print(", 고도: "); Serial.println(altitude);
+    Serial.println(); // 줄 바꿈
+
 
     if (Serial1.available()) {
         // 개행 문자('\n')까지 읽어서 문자열 생성
@@ -139,7 +142,7 @@ void loop() {
              filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
 
     // 송신 간격을 최소화하기 위해 1ms마다 송신
-    Serial.println(message);
+    
 
     rf95.send((uint8_t *)message, strlen(message) + 1);
 
@@ -152,7 +155,3 @@ void loop() {
         }
     }
 }
-
-
-//언마ㅣㅇㄴ머아
-///djsadjskajdksaj

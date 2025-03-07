@@ -20,10 +20,8 @@ void setup()
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
-  while (!Serial);
   Serial.begin(115200);
   delay(100);
-
 
   if (!rf95.init()) {
     Serial.println("LoRa radio init failed");
@@ -52,7 +50,22 @@ void loop()
 
     // 메시지 수신
     if (rf95.recv(buf, &len)) {
-      Serial.write(buf, len);
+      buf[len] = '\0';  // 문자열 끝을 명확히 지정
+      String receivedData = String((char*)buf);
+
+      // 쉼표(,)를 기준으로 데이터를 분리
+      float yaw, pitch, roll, temperature, pressure, altitude;
+      sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f", &yaw, &pitch, &roll, &temperature, &pressure, &altitude);
+
+      // 원하는 형식으로 시리얼 모니터 출력
+      Serial.print("Yaw: "); Serial.print(yaw);
+      Serial.print(", Pitch: "); Serial.print(pitch);
+      Serial.print(", Roll: "); Serial.println(roll);
+      
+      Serial.print("온도: "); Serial.print(temperature);
+      Serial.print(", 기압: "); Serial.print(pressure);
+      Serial.print(", 고도: "); Serial.println(altitude);
+      Serial.println(); // 줄 바꿈
 
     } else {
       Serial.println("Receive failed");

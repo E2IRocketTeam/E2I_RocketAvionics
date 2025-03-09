@@ -2,75 +2,52 @@
 #include <RH_RF95.h>
 #include <Wire.h>
 #include "Sdcard.h"
-#include "BMP390.h"
+#include "Adafruit_BMP3XX.h"
 #include "BNO055.h"
 #include "Kalman.h"
 
-// RFM95W 핀 정의
 #define RFM95_CS 10
 #define RFM95_RST 9
 #define RFM95_INT 2
-#define RF95_FREQ 915.0 // 주파수 (모듈에 맞게 설정)
-
+#define RF95_FREQ 915.0 // LoRa 주파수 설정
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 const char* filename = "sensor_data.csv";
-BMP390 bmpSensor;
+Adafruit_BMP3XX bmpSensor;
 BNO055 bnoSensor;
-
 Kalman kalmanYaw, kalmanPitch, kalmanRoll;
 unsigned long previousTime = 0;
 
+void softwareReset() {
+    Serial.println("Resetting Transmitter...");
+    delay(1000);
+    SCB_AIRCR = 0x05FA0004;  // Teensy에서 소프트웨어 리셋 실행
+}
+
 void setup() {
     Serial.begin(115200);
+    Serial1.begin(115200); // RYLR896 모듈과 통신
     delay(100);
-
-    // LoRa 초기화 RFM
-    pinMode(RFM95_RST, OUTPUT);
-    digitalWrite(RFM95_RST, HIGH);
-
-    digitalWrite(RFM95_RST, LOW);
+    
+    Serial1.println("AT+BAND=868000000"); // RYLR896 주파수 설정
     delay(100);
-    digitalWrite(RFM95_RST, HIGH);
-    delay(100);
-
-    // LoRa 초기화 RYLR896
-    Serial1.begin(115200); 
-    Serial1.println("AT");                // 모듈 응답 확인
-    delay(50);
-    Serial1.println("AT+ADDRESS=2");        // 수신기 주소 설정 (송신기와 맞춰야 함)
-    delay(50);
-    Serial1.println("AT+NETWORKID=5");      // 네트워크 ID 설정 (송신기와 동일)
-    delay(50);
-    Serial1.println("AT+BAND=868000000");   // 주파수 설정 (예: 868MHz)
-    delay(50);
-
 
     if (!rf95.init()) {
-        Serial.println("LoRa 모듈 초기화 실패!");
+        Serial.println("LoRa radio init failed");
         while (1);
     }
-    Serial.println("LoRa 모듈 초기화 성공!");
+    Serial.println("LoRa radio init OK!");
 
     if (!rf95.setFrequency(RF95_FREQ)) {
-        Serial.println("LoRa 주파수 설정 실패!");
+        Serial.println("setFrequency failed");
         while (1);
     }
-    Serial.print("LoRa 주파수 설정 완료: "); Serial.println(RF95_FREQ);
+    Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+    rf95.setTxPower(23, false);
 
-    // LoRa 모듈 파라미터 최적화
-
-    rf95.setTxPower(23, false);  // 송신 전력 최대 설정 (23dBm)
-
-    // SD 카드 초기화
-    if (!initializeSD()) {
-        Serial.println("SD 카드 초기화 실패!");
-        while (1);
-    }
-
-    // 센서 초기화
-    if (!bmpSensor.begin()) {
+    // BMP390 센서 초기화
+    if (!bmpSensor.begin_I2C()) { // I2C 모드로 초기화
         Serial.println("BMP390 센서 초기화 실패!");
         while (1);
     }
@@ -80,78 +57,53 @@ void setup() {
         while (1);
     }
 
-    if (!createLogFile(filename)) {
-        Serial.println("로그 파일 생성 실패!");
-        while (1);
-    }
-
-    float initYaw, initPitch, initRoll;
-    bnoSensor.readData(initYaw, initPitch, initRoll);
-    kalmanYaw.setAngle(initYaw);
-    kalmanPitch.setAngle(initPitch);
-    kalmanRoll.setAngle(initRoll);
-
-    previousTime = millis(); // dt 계산을 위한 초기 시간 설정
-
-    Serial.println("시스템 초기화 완료.");
+    Serial.println("센서 초기화 완료.");
 }
 
 void loop() {
+    float filteredYaw, filteredPitch, filteredRoll;
     float temperature, pressure, altitude;
-    float rawYaw, rawPitch, rawRoll;
 
-    // BMP390 센서 데이터 읽기
-    bmpSensor.readData(temperature, pressure, altitude);
+    // BNO055에서 Yaw, Pitch, Roll 데이터 읽기
+    bnoSensor.readData(filteredYaw, filteredPitch, filteredRoll);
 
-    // BNO055 센서 데이터 읽기 (원본 각도값)
-    bnoSensor.readData(rawYaw, rawPitch, rawRoll);
+    // BMP390에서 온도, 기압, 고도 데이터 읽기
+    bmpSensor.performReading();
+    temperature = bmpSensor.temperature;
+    pressure = bmpSensor.pressure / 100.0; // Pa -> hPa 변환
+    altitude = bmpSensor.readAltitude(1013.25); // 기준 기압(1013.25 hPa) 적용
 
-    unsigned long currentTime = millis();
-    float dt = (currentTime - previousTime) / 1000.0f;
-    previousTime = currentTime;
-
-    // 칼만 필터 적용
-    float filteredYaw = kalmanYaw.getAngle(rawYaw, 0, dt);
-    float filteredPitch = kalmanPitch.getAngle(rawPitch, 0, dt);
-    float filteredRoll = kalmanRoll.getAngle(rawRoll, 0, dt);
-
-    // SD 카드에 로그 기록
-    logData(filename, filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
-
-    // 시리얼 모니터에 데이터 출력
     Serial.print("Yaw: "); Serial.print(filteredYaw);
     Serial.print(", Pitch: "); Serial.print(filteredPitch);
     Serial.print(", Roll: "); Serial.println(filteredRoll);
-    
+
     Serial.print("온도: "); Serial.print(temperature);
     Serial.print(", 기압: "); Serial.print(pressure);
     Serial.print(", 고도: "); Serial.println(altitude);
-    Serial.println(); // 줄 바꿈
+    Serial.println();
 
-
-    if (Serial1.available()) {
-        // 개행 문자('\n')까지 읽어서 문자열 생성
-        String receivedMessage = Serial1.readStringUntil('\n');
-        Serial.print("수신: ");
-        Serial.println(receivedMessage);
-      }
-      
-    // LoRa로 데이터 전송 (CSV 형식)
-    char message[50]; // 작은 크기의 메시지를 사용
-    snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+    // 센서 데이터를 LoRa를 통해 송신
+    char message[50];
+    snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", 
              filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
 
-    // 송신 간격을 최소화하기 위해 1ms마다 송신
-    
-
     rf95.send((uint8_t *)message, strlen(message) + 1);
+    rf95.waitPacketSent();
 
-    // 송신 대기 시간 최소화
-    unsigned long startTime = millis();
-    while (!rf95.waitPacketSent()) {
-        if (millis() - startTime > 50) { // 50ms 이상 대기하지 않도록
-            Serial.println("송신 실패!");
-            return;
+    // LoRa 메시지 수신 확인 (RESET 명령 수신 처리)
+    if (rf95.available()) {
+        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+        uint8_t len = sizeof(buf);
+        if (rf95.recv(buf, &len)) {
+            buf[len] = '\0';
+            String receivedData = String((char*)buf);
+            Serial.print("Received: "); Serial.println(receivedData);
+
+            if (receivedData == "RESET") {
+                softwareReset();  // Teensy 소프트웨어 리셋 실행
+            }
         }
     }
+
+    delay(1000);
 }

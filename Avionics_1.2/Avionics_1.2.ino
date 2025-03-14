@@ -73,14 +73,6 @@ void loop() {
     pressure = bmpSensor.pressure / 100.0; // Pa -> hPa 변환
     altitude = bmpSensor.readAltitude(1013.25); // 기준 기압(1013.25 hPa) 적용
 
-    Serial.print(filteredYaw);
-    Serial.print(filteredPitch);
-    Serial.println(filteredRoll);
-
-    Serial.print(temperature);
-    Serial.print(pressure);
-    Serial.println(altitude);
-    Serial.println();
     Serial.print(filteredYaw); Serial.print(",");
     Serial.print(filteredPitch); Serial.print(",");
     Serial.println(filteredRoll); Serial.print(",");

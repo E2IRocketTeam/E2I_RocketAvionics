@@ -1,64 +1,68 @@
 import serial
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from collections import deque
+from matplotlib.animation import FuncAnimation
+import time
 
-# 시리얼 포트 설정
-SERIAL_PORT = 'COM6'  # Raspberry Pi에서는 '/dev/ttyUSB0' 등으로 변경
-BAUD_RATE = 115200
+# Set up serial connection (update 'COM3' to your port)
+ser = serial.Serial('COM16', 115200, timeout=0.005)  # Replace 'COM3' with your port
+time.sleep(2)  # Allow some time for the connection to stabilize
 
-# 그래프 데이터 저장용 큐 (최근 100개 데이터 저장)
-max_length = 100
-data = {
-    'yaw_raw': deque(maxlen=max_length), 'pitch_raw': deque(maxlen=max_length), 'roll_raw': deque(maxlen=max_length),
-    'yaw_filtered': deque(maxlen=max_length), 'pitch_filtered': deque(maxlen=max_length), 'roll_filtered': deque(maxlen=max_length)
-}
+# Data storage
+bno085_pitch = []
+bno055_pitch = []
+timestamps = []
 
-# 시리얼 포트 열기
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.005)
+# Plotting setup
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.set_title("Pitch Comparison: BNO085 vs BNO055")
+ax.set_xlabel("Time (samples)")
+ax.set_ylabel("Pitch (degrees)")
+ax.set_xlim(0, 100)
+ax.set_ylim(-180, 180)
+line_085, = ax.plot([], [], label="BNO085 Pitch", color="blue")
+line_055, = ax.plot([], [], label="BNO055 Pitch", color="red")
+ax.legend()
 
-# 그래프 업데이트 함수
 def update(frame):
-    if ser.in_waiting:
-        try:
-            # 시리얼 데이터 읽기
-            line = ser.readline().decode('utf-8').strip()
-            values = list(map(float, line.split(', ')))  # 데이터 분리 및 변환
+    global timestamps, bno085_pitch, bno055_pitch
 
-            # 데이터 저장 (yaw, pitch, roll 원본 및 필터 적용)
-            data['yaw_raw'].append(values[0])
-            data['pitch_raw'].append(values[1])
-            data['roll_raw'].append(values[2])
-            data['yaw_filtered'].append(values[3])
-            data['pitch_filtered'].append(values[4])
-            data['roll_filtered'].append(values[5])
+    try:
+        # Read line from serial
+        line = ser.readline().decode('utf-8').strip()
+        if line:
+            # Parse pitch values
+            pitch_values = line.split(",")
+            if len(pitch_values) == 2:
+                pitch_085 = float(pitch_values[0])
+                pitch_055 = float(pitch_values[1])
 
-            # 그래프 업데이트
-            ax.clear()
-            ax.plot(data['yaw_raw'], label="Yaw (Raw)", color='red', linestyle='solid')
-            ax.plot(data['yaw_filtered'], label="Yaw (Filtered)", color='red', linestyle='dashed')
+                # Append to data lists
+                bno085_pitch.append(pitch_085)
+                bno055_pitch.append(pitch_055)
+                timestamps.append(len(timestamps))
 
-            ax.plot(data['pitch_raw'], label="Pitch (Raw)", color='green', linestyle='solid')
-            ax.plot(data['pitch_filtered'], label="Pitch (Filtered)", color='green', linestyle='dashed')
+                # Keep only the latest 100 samples
+                if len(timestamps) > 100:
+                    bno085_pitch.pop(0)
+                    bno055_pitch.pop(0)
+                    timestamps.pop(0)
 
-            ax.plot(data['roll_raw'], label="Roll (Raw)", color='blue', linestyle='solid')
-            ax.plot(data['roll_filtered'], label="Roll (Filtered)", color='blue', linestyle='dashed')
+    except Exception as e:
+        print(f"Error: {e}")
 
-            ax.legend()
-            ax.set_title("Yaw, Pitch, Roll - Raw vs. Filtered")
-            ax.set_xlabel("Time")
-            ax.set_ylabel("Angle (degrees)")
-            ax.set_ylim(-180, 180)
-            ax.grid(True)
+    # Update plot data
+    line_085.set_data(timestamps, bno085_pitch)
+    line_055.set_data(timestamps, bno055_pitch)
 
-        except Exception as e:
-            print(f"Error: {e}")
+    # Adjust axes limits dynamically
+    ax.set_xlim(max(0, len(timestamps) - 100), len(timestamps))
 
-# 그래프 초기 설정
-fig, ax = plt.subplots(figsize=(8, 5))
+    return line_085, line_055
 
-ani = animation.FuncAnimation(fig, update, interval=100)
+# Create animation
+ani = FuncAnimation(fig, update, interval=100)
+plt.tight_layout()
 plt.show()
 
-# 종료 시 시리얼 닫기
+# Close serial connection on exit
 ser.close()

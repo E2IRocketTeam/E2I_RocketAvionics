@@ -73,13 +73,13 @@ void loop() {
     pressure = bmpSensor.pressure / 100.0; // Pa -> hPa 변환
     altitude = bmpSensor.readAltitude(1013.25); // 기준 기압(1013.25 hPa) 적용
 
-    Serial.print("Yaw: "); Serial.print(filteredYaw);
-    Serial.print(", Pitch: "); Serial.print(filteredPitch);
-    Serial.print(", Roll: "); Serial.println(filteredRoll);
+    Serial.print(filteredYaw);
+    Serial.print(filteredPitch);
+    Serial.println(filteredRoll);
 
-    Serial.print("온도: "); Serial.print(temperature);
-    Serial.print(", 기압: "); Serial.print(pressure);
-    Serial.print(", 고도: "); Serial.println(altitude);
+    Serial.print(temperature);
+    Serial.print(pressure);
+    Serial.println(altitude);
     Serial.println();
 
     // 센서 데이터를 LoRa를 통해 송신
@@ -105,5 +105,5 @@ void loop() {
         }
     }
 
-    delay(1000);
+
 }

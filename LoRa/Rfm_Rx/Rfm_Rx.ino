@@ -41,13 +41,13 @@ void loop() {
             float yaw, pitch, roll, temperature, pressure, altitude;
             sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f", &yaw, &pitch, &roll, &temperature, &pressure, &altitude);
 
-            Serial.print("Yaw: "); Serial.print(yaw);
-            Serial.print(", Pitch: "); Serial.print(pitch);
-            Serial.print(", Roll: "); Serial.println(roll);
+            Serial.print(yaw);
+            Serial.print(pitch);
+            Serial.println(roll);
 
-            Serial.print("온도: "); Serial.print(temperature);
-            Serial.print(", 기압: "); Serial.print(pressure);
-            Serial.print(", 고도: "); Serial.println(altitude);
+            Serial.print(temperature);
+            Serial.print(pressure);
+            Serial.println(altitude);
             Serial.println();
         }
     }

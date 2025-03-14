@@ -81,6 +81,12 @@ void loop() {
     Serial.print(pressure);
     Serial.println(altitude);
     Serial.println();
+    Serial.print(filteredYaw); Serial.print(",");
+    Serial.print(filteredPitch); Serial.print(",");
+    Serial.println(filteredRoll); Serial.print(",");
+    Serial.print(temperature); Serial.print(",");
+    Serial.print(pressure); Serial.print(",");
+    Serial.println(altitude);
 
     // 센서 데이터를 LoRa를 통해 송신
     char message[50];

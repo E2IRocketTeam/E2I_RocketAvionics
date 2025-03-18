@@ -75,7 +75,7 @@ void loop() {
 
     Serial.print(filteredYaw); Serial.print(",");
     Serial.print(filteredPitch); Serial.print(",");
-    Serial.println(filteredRoll); Serial.print(",");
+    Serial.print(filteredRoll); Serial.print(",");
     Serial.print(temperature); Serial.print(",");
     Serial.print(pressure); Serial.print(",");
     Serial.println(altitude);

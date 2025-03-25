@@ -2,7 +2,7 @@
 #include <RH_RF95.h>
 #include <Wire.h>
 #include "Sdcard.h"
-#include "Adafruit_BMP3XX.h"
+#include "BMP390.h"
 #include "BNO055.h"
 #include "Kalman.h"
 
@@ -14,8 +14,8 @@
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 const char* filename = "sensor_data.csv";
-Adafruit_BMP3XX bmpSensor;
 BNO055 bnoSensor;
+BMP390 bmpSensor;
 Kalman kalmanYaw, kalmanPitch, kalmanRoll;
 unsigned long previousTime = 0;
 
@@ -47,7 +47,7 @@ void setup() {
     rf95.setTxPower(23, false);
 
     // BMP390 센서 초기화
-    if (!bmpSensor.begin_I2C()) { // I2C 모드로 초기화
+    if (!bmpSensor.begin()) { // I2C 모드로 초기화
         Serial.println("BMP390 센서 초기화 실패!");
         while (1);
     }
@@ -68,10 +68,7 @@ void loop() {
     bnoSensor.readData(filteredYaw, filteredPitch, filteredRoll);
 
     // BMP390에서 온도, 기압, 고도 데이터 읽기
-    bmpSensor.performReading();
-    temperature = bmpSensor.temperature;
-    pressure = bmpSensor.pressure / 100.0; // Pa -> hPa 변환
-    altitude = bmpSensor.readAltitude(1013.25); // 기준 기압(1013.25 hPa) 적용
+    bmpSensor.readData(temperature, pressure, altitude);
 
     Serial.print(filteredYaw); Serial.print(",");
     Serial.print(filteredPitch); Serial.print(",");

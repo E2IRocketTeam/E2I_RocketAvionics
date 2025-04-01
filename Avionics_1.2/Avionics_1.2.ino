@@ -16,7 +16,6 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 const char* filename = "sensor_data.csv";
 BNO085 bnoSensor;
 BMP390 bmpSensor;
-Kalman kalmanYaw, kalmanPitch, kalmanRoll;
 unsigned long previousTime = 0;
 
 void softwareReset() {
@@ -62,18 +61,18 @@ void setup() {
 }
 
 void loop() {
-    float filteredYaw, filteredPitch, filteredRoll;
+    float yaw, pitch, roll;
     float temperature, pressure, altitude;
 
     // Yaw, Pitch, Roll data reading From BNO085
-    bnoSensor.readData(filteredYaw, filteredPitch, filteredRoll);
+    bnoSensor.readData(yaw, pitch, roll);
 
     // Temperature, Pressure, altitude data From BMP390
     bmpSensor.readData(temperature, pressure, altitude);
 
-    Serial.print(filteredYaw); Serial.print(",");
-    Serial.print(filteredPitch); Serial.print(",");
-    Serial.print(filteredRoll); Serial.print(",");
+    Serial.print(yaw); Serial.print(",");
+    Serial.print(pitch); Serial.print(",");
+    Serial.print(roll); Serial.print(",");
     Serial.print(temperature); Serial.print(",");
     Serial.print(pressure); Serial.print(",");
     Serial.println(altitude);
@@ -81,7 +80,8 @@ void loop() {
     // Transmit sensor data via LoRa
     char message[50];
     snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", 
-             filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
+             yaw, pitch, roll
+        , temperature, pressure, altitude);
 
     rf95.send((uint8_t *)message, strlen(message) + 1);
     rf95.waitPacketSent();

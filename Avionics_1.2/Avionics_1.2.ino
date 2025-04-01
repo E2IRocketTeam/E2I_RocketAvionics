@@ -9,7 +9,7 @@
 #define RFM95_CS 10
 #define RFM95_RST 9
 #define RFM95_INT 2
-#define RF95_FREQ 915.0 // RF95W Frequency setting (915MHz)
+#define RF95_FREQ 915.0 // RF95W frequency setting (915MHz)
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -30,7 +30,7 @@ void setup() {
     Serial1.begin(115200); // RYLR896 setting
     delay(100);
     
-    Serial1.println("AT+BAND=868000000"); // RYLR896 Frequency setting (868MHz)
+    Serial1.println("AT+BAND=868000000"); // RYLR896 frequency setting (868MHz)
     delay(100);
 
     if (!rf95.init()) {
@@ -46,12 +46,13 @@ void setup() {
     Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
     rf95.setTxPower(23, false);
 
-    // BMP390 setting reset
+    // Initialize BMP390 sensor
     if (!bmpSensor.begin()) { // I2C mode reset
         Serial.println("BMP390 센서 초기화 실패!");
         while (1);
     }
 
+    // Initialize BNO085 sensor
     if (!bnoSensor.begin()) {
         Serial.println("BNO085 센서 초기화 실패!");
         while (1);
@@ -67,7 +68,7 @@ void loop() {
     // Yaw, Pitch, Roll data reading From BNO085
     bnoSensor.readData(filteredYaw, filteredPitch, filteredRoll);
 
-    // Temperature, Pressure, altitude From BMP390
+    // Temperature, Pressure, altitude data From BMP390
     bmpSensor.readData(temperature, pressure, altitude);
 
     Serial.print(filteredYaw); Serial.print(",");
@@ -77,7 +78,7 @@ void loop() {
     Serial.print(pressure); Serial.print(",");
     Serial.println(altitude);
 
-    // Transmit sensor data through LoRa
+    // Transmit sensor data via LoRa
     char message[50];
     snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", 
              filteredYaw, filteredPitch, filteredRoll, temperature, pressure, altitude);
@@ -85,7 +86,7 @@ void loop() {
     rf95.send((uint8_t *)message, strlen(message) + 1);
     rf95.waitPacketSent();
 
-    // LoRa message check (RESET Receiving)
+    // Check for LoRa messages (handle RESET command)
     if (rf95.available()) {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         uint8_t len = sizeof(buf);

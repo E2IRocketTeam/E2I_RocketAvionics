@@ -41,13 +41,13 @@ void loop() {
             float yaw, pitch, roll, temperature, pressure, altitude;
             sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f", &yaw, &pitch, &roll, &temperature, &pressure, &altitude);
 
-            Serial.print(yaw);
-            Serial.print(pitch);
-            Serial.println(roll);
+            Serial.print(yaw); Serial.print(",");
+            Serial.print(pitch); Serial.print(",");
+            Serial.println(roll); Serial.print(",");
 
-            Serial.print(temperature);
-            Serial.print(pressure);
-            Serial.println(altitude);
+            Serial.print(temperature); Serial.print(",");
+            Serial.print(pressure); Serial.print(",");
+            Serial.println(altitude); Serial.print(",");
             Serial.println();
         }
     }

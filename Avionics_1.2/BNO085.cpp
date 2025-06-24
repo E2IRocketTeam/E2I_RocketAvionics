@@ -7,10 +7,11 @@ bool BNO085::begin() {
         return false;
     }
 
-    bno.enableReport(SH2_ACCELEROMETER);
-    bno.enableReport(SH2_GYROSCOPE_CALIBRATED);
-    bno.enableReport(SH2_MAGNETIC_FIELD_CALIBRATED);
-    bno.enableReport(SH2_ROTATION_VECTOR);
+    bno.enableReport(SH2_ACCELEROMETER, 2000);              // 500Hz
+    bno.enableReport(SH2_GYROSCOPE_CALIBRATED, 2000);       // 500Hz
+    bno.enableReport(SH2_MAGNETIC_FIELD_CALIBRATED, 5000);  // 200Hz
+    bno.enableReport(SH2_GAME_ROTATION_VECTOR, 1000);       // 1000Hz - 빠른 반응
+
     return true;
 }
 
@@ -33,6 +34,19 @@ void BNO085::update() {
                 magnetometer.y = sensorValue.un.magneticField.y;
                 magnetometer.z = sensorValue.un.magneticField.z;
                 break;
+            case SH2_GAME_ROTATION_VECTOR: {
+                float qw = sensorValue.un.rotationVector.real;
+                float qx = sensorValue.un.rotationVector.i;
+                float qy = sensorValue.un.rotationVector.j;
+                float qz = sensorValue.un.rotationVector.k;
+
+                rotation.x = atan2f(2.0f * (qy * qz + qw * qx),
+                                    qw * qw - qx * qx - qy * qy + qz * qz) * 180.0f / PI;
+                rotation.y = asinf(-2.0f * (qx * qz - qw * qy)) * 180.0f / PI;
+                rotation.z = atan2f(2.0f * (qx * qy + qw * qz),
+                                    qw * qw + qx * qx - qy * qy - qz * qz) * 180.0f / PI;
+                break;
+            }
         }
     }
 }
@@ -50,17 +64,7 @@ Vector3 BNO085::getMagnetometer() const {
 }
 
 void BNO085::readData(float &yaw, float &pitch, float &roll) {
-    sh2_SensorValue_t sensorValue;
-    if (bno.getSensorEvent(&sensorValue) && sensorValue.sensorId == SH2_ROTATION_VECTOR) {
-        float qw = sensorValue.un.rotationVector.real;
-        float qx = sensorValue.un.rotationVector.i;
-        float qy = sensorValue.un.rotationVector.j;
-        float qz = sensorValue.un.rotationVector.k;
-
-        yaw = atan2f(2.0f * (qy * qz + qw * qx), qw * qw - qx * qx - qy * qy + qz * qz) * 180.0f / PI;
-        pitch = asinf(-2.0f * (qx * qz - qw * qy)) * 180.0f / PI;
-        roll = atan2f(2.0f * (qx * qy + qw * qz), qw * qw + qx * qx - qy * qy - qz * qz) * 180.0f / PI;
-    } else {
-        yaw = pitch = roll = 0.0f;
-    }
+    yaw = rotation.x;
+    pitch = rotation.y;
+    roll = rotation.z;
 }

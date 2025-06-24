@@ -10,7 +10,7 @@ struct Vector3 {
     float z;
 };
 
-class BNO085 {    // ⬅️ 클래스 이름이 BNO085 여야 함
+class BNO085 {
 public:
     BNO085(uint8_t address = 0x4A);
     bool begin();
@@ -19,12 +19,14 @@ public:
     Vector3 getGyroscope() const;
     Vector3 getMagnetometer() const;
     void readData(float &yaw, float &pitch, float &roll);
+
 private:
     Adafruit_BNO08x bno;
     uint8_t address;
     Vector3 accelerometer;
     Vector3 gyroscope;
     Vector3 magnetometer;
+    Vector3 rotation;
 };
 
 #endif

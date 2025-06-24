@@ -14,7 +14,8 @@
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 const char* filename = "sensor_data.csv";
-BNO085 bnoSensor;
+
+BNO085 bnoSensor(0x4A);
 BMP390 bmpSensor;
 unsigned long previousTime = 0;
 
@@ -32,6 +33,11 @@ void setup() {
     Serial1.println("AT+BAND=868000000"); // RYLR896 frequency setting (868MHz)
     delay(100);
 
+      if (!initializeSD()) {
+        Serial.println("SD card initialization failed!");
+        while (1);
+    }
+    
     if (!rf95.init()) {
         Serial.println("LoRa radio init failed");
         while (1);
@@ -61,21 +67,34 @@ void setup() {
 }
 
 void loop() {
+     bnoSensor.update();
     float yaw, pitch, roll;
     float temperature, pressure, altitude;
-
+    //bnoSensor.update(); 
     // Yaw, Pitch, Roll data reading From BNO085
+   
     bnoSensor.readData(yaw, pitch, roll);
 
     // Temperature, Pressure, altitude data From BMP390
     bmpSensor.readData(temperature, pressure, altitude);
 
-    Serial.print(yaw); Serial.print(",");
-    Serial.print(pitch); Serial.print(",");
-    Serial.print(roll); Serial.print(",");
-    Serial.print(temperature); Serial.print(",");
-    Serial.print(pressure); Serial.print(",");
-    Serial.println(altitude);
+     if (logData(filename, yaw, pitch, roll, temperature, pressure, altitude)) {
+        Serial.print("Logged Data: ");
+        Serial.print(yaw, 2); Serial.print(", ");
+        Serial.print(pitch, 2); Serial.print(", ");
+        Serial.print(roll, 2); Serial.print(", ");
+        Serial.print(temperature, 2); Serial.print(", ");
+        Serial.print(pressure, 2); Serial.print(", ");
+        Serial.println(altitude, 2);
+    } else {
+        Serial.println("Failed to log data");
+    }
+    // Serial.print(yaw); Serial.print(",");
+    // Serial.print(pitch); Serial.print(",");
+    // Serial.print(roll); Serial.print(",");
+    // Serial.print(temperature); Serial.print(",");
+    // Serial.print(pressure); Serial.print(",");
+    // Serial.println(altitude);
 
     // Transmit sensor data via LoRa
     char message[50];

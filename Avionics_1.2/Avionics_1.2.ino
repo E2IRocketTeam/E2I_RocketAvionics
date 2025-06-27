@@ -68,15 +68,15 @@ void loop() {
               temperature, pressure, altitude)) {
 
     // Print current status to Serial Monitor for debugging
-    Serial.print(yaw, 1); Serial.print(",");
-    Serial.print(pitch, 1); Serial.print(",");
-    Serial.print(roll, 1);Serial.print(",");
+    Serial.print(yaw, 2); Serial.print(",");
+    Serial.print(pitch, 2); Serial.print(",");
+    Serial.print(roll, 2);Serial.print(",");
     Serial.print(acceleration.x, 2); Serial.print(",");
     Serial.print(acceleration.y, 2); Serial.print(",");
     Serial.print(acceleration.z, 2);Serial.print(",");
-    Serial.print(temperature, 1); Serial.print("C,");
-    Serial.print(pressure, 1); Serial.print("hPa,");
-    Serial.print(altitude, 1); Serial.print("m");
+    Serial.print(temperature, 2); Serial.print(",");
+    Serial.print(pressure, 2); Serial.print(",");
+    Serial.print(altitude, 2);
     Serial.println();
 
   } else {

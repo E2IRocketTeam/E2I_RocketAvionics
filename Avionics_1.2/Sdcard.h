@@ -7,7 +7,8 @@ const int chipSelect = BUILTIN_SDCARD;
 
 bool initializeSD();
 bool createLogFile(const char* filename);
-// 가속도 데이터를 받을 수 있도록 인자 추가
-bool logData(const char* filename, float yaw, float pitch, float roll, float XAcc, float YAcc, float ZAcc, float temperature, float pressure, float altitude);
 
-#endif 
+// 요청하신 순서대로 함수의 인자 순서를 변경합니다.
+bool logData(const char* filename, float yaw, float pitch, float roll, float accelX, float accelY, float accelZ, float temperature, float pressure, float altitude);
+
+#endif

@@ -25,6 +25,7 @@ void softwareReset() {
     SCB_AIRCR = 0x05FA0004;  // Teensy software reset 
 }
 
+//나중에 Serial print 지우기
 void setup() {
     Serial.begin(115200);
     Serial1.begin(115200); // RYLR896 setting
@@ -53,40 +54,48 @@ void setup() {
 
     // Initialize BMP390 sensor
     if (!bmpSensor.begin()) { // I2C mode reset
-        Serial.println("BMP390 센서 초기화 실패!");
+        Serial.println("BMP390 initialization failed!");
         while (1);
     }
 
     // Initialize BNO085 sensor
     if (!bnoSensor.begin()) {
-        Serial.println("BNO085 센서 초기화 실패!");
+        Serial.println("BNO085 initialization failed!");
         while (1);
     }
 
-    Serial.println("센서 초기화 완료.");
+    Serial.println("Sensor initialization complete.");
 }
 
 void loop() {
      bnoSensor.update();
+
     float yaw, pitch, roll;
     float temperature, pressure, altitude;
-    //bnoSensor.update(); 
+    Vector3 acceleration;
     // Yaw, Pitch, Roll data reading From BNO085
    
     bnoSensor.readData(yaw, pitch, roll);
+    acceleration = bnoSensor.getAccelerometer();
 
     // Temperature, Pressure, altitude data From BMP390
     bmpSensor.readData(temperature, pressure, altitude);
 
-     if (logData(filename, yaw, pitch, roll, temperature, pressure, altitude)) {
-        Serial.print("Logged Data: ");
-        Serial.print(yaw, 2); Serial.print(", ");
-        Serial.print(pitch, 2); Serial.print(", ");
-        Serial.print(roll, 2); Serial.print(", ");
-        Serial.print(temperature, 2); Serial.print(", ");
-        Serial.print(pressure, 2); Serial.print(", ");
-        Serial.println(altitude, 2);
-    } else {
+    if (logData(filename, yaw, pitch, roll,acceleration.x, acceleration.y, acceleration.z,
+            temperature, pressure, altitude)) {
+    
+    Serial.print(yaw, 2); Serial.print(",");
+    Serial.print(pitch, 2); Serial.print(",");
+    Serial.print(roll, 2);Serial.print(",");
+    Serial.print(acceleration.x, 2); Serial.print(",");
+    Serial.print(acceleration.y, 2); Serial.print(",");
+    Serial.print(acceleration.z, 2);Serial.print(",");
+    Serial.print(temperature,2); Serial.print(",");
+    Serial.print(pressure,2); Serial.print(",");
+    Serial.print(altitude, 2);
+
+    Serial.println();
+  } else {
         Serial.println("Failed to log data");
     }
     // Serial.print(yaw); Serial.print(",");

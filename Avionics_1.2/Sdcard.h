@@ -7,6 +7,7 @@ const int chipSelect = BUILTIN_SDCARD;
 
 bool initializeSD();
 bool createLogFile(const char* filename);
-bool logData(const char* filename, float yaw, float pitch, float roll, float temperature, float pressure, float altitude);
+// 가속도 데이터를 받을 수 있도록 인자 추가
+bool logData(const char* filename, float yaw, float pitch, float roll, float XAcc, float YAcc, float ZAcc, float temperature, float pressure, float altitude);
 
-#endif
+#endif 

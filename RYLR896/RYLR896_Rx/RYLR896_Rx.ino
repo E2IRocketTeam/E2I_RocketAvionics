@@ -3,7 +3,7 @@ void setup() {
     while (!Serial); // USB 시리얼 연결 대기 (필요시 사용)
     
     // RYLR896과의 통신을 위한 하드웨어 시리얼 (예: Serial1 사용)
-    Serial1.begin(9600);  
+    Serial1.begin(115200);  
     delay(1000);
     
     Serial.println("RYLR896 수신기 모드 시작...");

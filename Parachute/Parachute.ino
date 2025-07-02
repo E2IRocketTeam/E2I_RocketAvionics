@@ -8,7 +8,7 @@ void setup() {
 
 void loop() {
     float yaw, pitch, roll;
-    parachute.getSensorData(yaw, pitch, roll); // BNO055 센서 값 가져오기
+    parachute.getSensorData(yaw, pitch, roll); // BNO085 센서 값 가져오기
 
     Serial.print("Yaw: ");
     Serial.print(yaw);

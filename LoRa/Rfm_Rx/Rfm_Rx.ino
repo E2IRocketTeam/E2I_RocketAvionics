@@ -38,13 +38,17 @@ void loop() {
             buf[len] = '\0';
             String receivedData = String((char*)buf);
 
-            float yaw, pitch, roll, temperature, pressure, altitude;
-            sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f", &yaw, &pitch, &roll, &temperature, &pressure, &altitude);
+            float yaw, pitch, roll, acceleration.x, acceleration.y, acceleration.z, temperature, pressure, altitude;
+            sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f,%f,%f,%f", &yaw, &pitch, &roll, &acceleration.x, &acceleration.y, &acceleration.z, &temperature, &pressure, &altitude);
 
             Serial.print(yaw); Serial.print(",");
             Serial.print(pitch); Serial.print(",");
             Serial.println(roll); Serial.print(",");
 
+            Serial.print(acceleration.x); Serial.print(",");
+            Serial.print(acceleration.y); Serial.print(",");
+            Serial.println(acceleration.z); Serial.print(",");
+            
             Serial.print(temperature); Serial.print(",");
             Serial.print(pressure); Serial.print(",");
             Serial.println(altitude); Serial.print(",");

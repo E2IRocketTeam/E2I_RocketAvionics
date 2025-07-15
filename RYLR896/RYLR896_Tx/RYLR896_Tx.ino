@@ -18,19 +18,25 @@ void setup() {
   delay(500);
   Serial1.println("AT+BAND=862000000");    // 주파수 설정 (예: 915MHz)
   delay(500);
+
+  Serial.println("입력할 메시지를 보내면 송신됩니다.");
 }
 
 void loop() {
-  String message = "Hello World!";
+  if (Serial.available()) {
+    String userInput = Serial.readStringUntil('\n'); // 엔터 칠 때까지 입력
+    userInput.trim(); // 공백, \r 제거
 
-  // AT 명령: AT+SEND=<수신기주소>,<데이터길이>,<데이터>
-  Serial1.print("AT+SEND=2,"); // 수신기 주소를 2로 지정 (아두이노가 2)
-  Serial1.print(message.length());
-  Serial1.print(",");
-  Serial1.println(message);
-  
-  Serial.print("송신: ");
-  Serial.println(message);
-  
-  delay(2000); // 2초마다 전송
+    if (userInput.length() > 0) {
+      // 송신 명령 구성 및 전송
+      Serial1.print("AT+SEND=2,"); // 수신기 주소가 2
+      Serial1.print(userInput.length());
+      Serial1.print(",");
+      Serial1.println(userInput);
+
+      // USB 시리얼에도 로그 출력
+      Serial.print("송신: ");
+      Serial.println(userInput);
+    }
+  }
 }

@@ -39,7 +39,19 @@ void loop() {
   if (Serial1.available()) {
     // 개행 문자('\n')까지 읽어서 문자열 생성
     String receivedMessage = Serial1.readStringUntil('\n');
-    Serial.print("수신: ");
-    Serial.println(receivedMessage);
+    receivedMessage.trim();
+      
+      if(receivedMessage.length()>0){
+        Serial.print("수신: ");
+        Serial.println(receivedMessage);
+        // +RCV=1,4,babo,-48,36 (+RCV= <ADDRESS>,<LENGTH>,<PAYLOAD>[,RSSI,SNR])
+          
+          if (receivedMessage.indexOf("babo") != -1) {
+          Serial.println("'babo' 명령 수신 -----> 사출");
+          // myServo.write(120);
+          // delay(1000);
+      }
+   
   }
+}
 }

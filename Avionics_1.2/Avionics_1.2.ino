@@ -1,8 +1,18 @@
 // E2I Rocket Avionics Main Control Code
+#include <SPI.h>
+#include <RH_RF95.h>
+#include <Wire.h>
 
 #include "BNO085.h"
 #include "BMP390.h"
 #include "Sdcard.h"
+
+#define RFM95_CS 10
+#define RFM95_RST 9
+#define RFM95_INT 2
+#define RF95_FREQ 915.0 // RF95W frequency setting (915MHz)
+
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 // Create sensor objects
 BNO085 bno085;

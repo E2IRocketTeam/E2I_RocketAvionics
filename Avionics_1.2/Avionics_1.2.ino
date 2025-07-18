@@ -83,6 +83,13 @@ void loop() {
     Serial.println("Error: Failed to write data to SD card.");
   }
 
+    char message[50];
+    snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", 
+             yaw, pitch, roll
+        , temperature, pressure, altitude);
+
+    rf95.send((uint8_t *)message, strlen(message) + 1);
+    rf95.waitPacketSent();
   // Set logging frequency
   delay(100);
 }

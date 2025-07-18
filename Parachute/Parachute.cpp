@@ -6,7 +6,7 @@ Parachute::Parachute(int servoPin) : sensor(0x28), servoPin(servoPin) {}
 void Parachute::begin() {
     Serial.begin(9600);
     if (!sensor.begin()) {
-        Serial.println("BNO055 연결 실패!");
+        Serial.println("BNO085 연결 실패!");
         while (1);
     }
 
@@ -15,7 +15,7 @@ void Parachute::begin() {
     // 서보모터 초기화
     servoMotor.attach(servoPin);
     servoMotor.write(0); // 초기 위치 (0도)
-    Serial.println("서보모터 & BNO055 초기화 완료!");
+    Serial.println("서보모터 & BNO085 초기화 완료!");
 }
 
 void Parachute::update() {

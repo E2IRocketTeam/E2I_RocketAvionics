@@ -56,6 +56,19 @@ void setup() {
     while (1) delay(10);
   }
 
+   if (!rf95.init()) {
+        Serial.println("LoRa radio init failed");
+        while (1);
+    }
+    Serial.println("LoRa radio init OK!");
+
+    if (!rf95.setFrequency(RF95_FREQ)) {
+        Serial.println("setFrequency failed");
+        while (1);
+    }
+    Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+    rf95.setTxPower(23, false);
+
 }
 
 void loop() {

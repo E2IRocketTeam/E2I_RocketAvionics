@@ -17,16 +17,16 @@ public:
     BNO085(uint8_t address = 0x4A);
     // 센서 초기화
     bool begin();
-    // 센서의 최신 값을 내부 변수로 읽어오는 함수
+    // 센서의 최신 값을 읽어와 내부 변수에 저장하는 함수
     void update();
 
-    // 내부 변수에 저장된 가속도, 자이로, 지자기 값을 반환하는 함수
+    // 저장된 센서 값을 반환하는 getter 함수들
+    float getYaw() const;
+    float getPitch() const;
+    float getRoll() const;
     Vector3 getAccelerometer() const;
     Vector3 getGyroscope() const;     // (참고) 현재 구현에서는 사용되지 않음
     Vector3 getMagnetometer() const;  // (참고) 현재 구현에서는 사용되지 않음
-
-    // 내부 변수의 회전 벡터 값을 Yaw, Pitch, Roll로 변환하여 반환하는 함수
-    void readData(float &yaw, float &pitch, float &roll);
 
 private:
     // Adafruit 라이브러리 객체
@@ -35,10 +35,12 @@ private:
     uint8_t address;
 
     // 센서 값을 저장하기 위한 내부 변수
+    float yaw, pitch, roll;
     Vector3 accelerometer;
     Vector3 gyroscope;
     Vector3 magnetometer;
-    // 쿼터니언 값을 저장하기 위한 변수
+    
+    // 센서 이벤트를 받기 위한 변수
     sh2_SensorValue_t sensorValue;
 };
 

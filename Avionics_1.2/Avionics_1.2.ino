@@ -13,7 +13,6 @@
 #define RF95_FREQ 915.0 // RF95W frequency setting (915MHz)
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
-
 // Create sensor objects
 BNO085 bno085;
 BMP390 bmp390;
@@ -32,7 +31,6 @@ void setup() {
     while (1) delay(10);
   }
   Serial.println("BNO085 initialized.");
-
   // Initialize BMP390
   Serial.println("Initializing BMP390 pressure sensor...");
   if (!bmp390.begin()) {
@@ -48,7 +46,6 @@ void setup() {
     while (1) delay(10);
   }
   Serial.println("SD card initialized.");
-
   Serial.print("Creating log file: ");
   Serial.println(logFilename);
   if (!createLogFile(logFilename)) {
@@ -68,23 +65,24 @@ void setup() {
     }
     Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
     rf95.setTxPower(23, false);
-
 }
 
 void loop() {
   // 1. Update sensor values internally
   bno085.update();
-
+  
   // Declare variables for sensor data
   float yaw, pitch, roll;
   float temperature, pressure, altitude;
   Vector3 acceleration;
-
-  // 2. Read the updated values
-  bno085.readData(yaw, pitch, roll);
+  
+  // 2. Read the updated values using getter functions
+  yaw = bno085.getYaw();
+  pitch = bno085.getPitch();
+  roll = bno085.getRoll();
   acceleration = bno085.getAccelerometer();
   bmp390.readData(temperature, pressure, altitude);
-
+  
   // 3. Log data to SD card
   if (logData(logFilename, yaw, pitch, roll,
               acceleration.x, acceleration.y, acceleration.z,
@@ -110,9 +108,9 @@ void loop() {
     snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", 
              yaw, pitch, roll
         , temperature, pressure, altitude);
-
     rf95.send((uint8_t *)message, strlen(message) + 1);
     rf95.waitPacketSent();
+    
   // Set logging frequency
   delay(100);
 }

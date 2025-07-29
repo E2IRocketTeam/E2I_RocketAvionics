@@ -8,6 +8,10 @@ bool initializeSD() {
 }
 
 bool createLogFile(const char* filename) {
+    
+     if (SD.exists(filename)) {
+        SD.remove(filename);  // 이전 내용 삭제 추가 !
+    }
     File dataFile = SD.open(filename, FILE_WRITE);
     if (dataFile) {
         // CSV 파일 헤더를 요청하신 순서대로 변경합니다.

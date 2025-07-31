@@ -1,21 +1,15 @@
+#include <Arduino.h>
 #include "Parachute.h"
 
-Parachute parachute(9); // 서보모터 9번 핀 사용
+const int SERVO_PIN = 22;             // 서보모터 연결 핀
+Parachute parachute(SERVO_PIN);     // 낙하산 객체 생성
 
 void setup() {
-    parachute.begin();
+    Serial.begin(9600);
+    parachute.begin();             // BNO085 + BMP390 + 서보 초기화
 }
 
 void loop() {
-    float yaw, pitch, roll;
-    parachute.getSensorData(yaw, pitch, roll); // BNO085 센서 값 가져오기
-
-    Serial.print("Yaw: ");
-    Serial.print(yaw);
-    Serial.print("°, Pitch: ");
-    Serial.print(pitch);
-    Serial.print("°, Roll: ");
-    Serial.println(roll);
-
-    parachute.update();
+    parachute.update();           // 낙하 조건 확인 및 사출 수행
+    delay(100);                   // 주기적으로 10Hz (100ms)
 }

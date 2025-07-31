@@ -1,21 +1,29 @@
 #ifndef PARACHUTE_H
 #define PARACHUTE_H
 
+#include <Servo.h>
 #include "BNO085.h"
-#include <Servo.h> // 서보모터 라이브러리 추가
+#include "BMP390.h"
 
 class Parachute {
-private:
-    BNO055 sensor;   // BNO085 센서 객체
-    Servo servoMotor; // 서보모터 객체
-    int servoPin;    // 서보모터 핀
-    const int thresholdAngle = 45; // 서보모터 작동 임계각
-
 public:
     Parachute(int servoPin);
     void begin();
     void update();
     void getSensorData(float &yaw, float &pitch, float &roll);
+
+private:
+    BNO085 bno;
+    BMP390 bmp;
+    Servo servo;
+    int servoPin;
+
+    float maxAltitude = 0;
+    float prevAltitude = 0;
+    unsigned long prevTime = 0;
+    unsigned long startTime = 0;
+    bool deployed = false;
+    bool initialized = false;
 };
 
 #endif

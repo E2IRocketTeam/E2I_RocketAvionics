@@ -91,10 +91,10 @@ void loop() {
     // Print current status to Serial Monitor for debugging
     Serial.print(yaw, 2); Serial.print(",");
     Serial.print(pitch, 2); Serial.print(",");
-    Serial.print(roll, 2);Serial.print(",");
-    Serial.print(acceleration.x, 2); Serial.print(",");
-    Serial.print(acceleration.y, 2); Serial.print(",");
-    Serial.print(acceleration.z, 2);Serial.print(",");
+    Serial.print(roll, 2);Serial.print(",,,,,");
+    Serial.print(acceleration.x, 2); Serial.print(",,,,,");
+    Serial.print(acceleration.y, 2); Serial.print(",,,,,");
+    Serial.print(acceleration.z, 2);Serial.print(",,,,,");
     Serial.print(temperature, 2); Serial.print(",");
     Serial.print(pressure, 2); Serial.print(",");
     Serial.print(altitude, 2);

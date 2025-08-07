@@ -1,48 +1,42 @@
 #include "Sdcard.h"
 
 bool initializeSD() {
-    if (!SD.begin(chipSelect)) {
-        return false;
-    }
-    return true;
+  return SD.begin(BUILTIN_SDCARD);  // Teensy 기준
 }
 
 bool createLogFile(const char* filename) {
-    
-     if (SD.exists(filename)) {
-        SD.remove(filename);  // 이전 내용 삭제 추가 !
-    }
-    File dataFile = SD.open(filename, FILE_WRITE);
-    if (dataFile) {
-        // CSV 파일 헤더를 요청하신 순서대로 변경합니다.
-        dataFile.println("Yaw,Pitch,Roll,AccelX,AccelY,AccelZ,Temperature,Pressure,Altitude");
-        dataFile.close();
-        return true;
-    }
-    return false;
+  File logFile = SD.open(filename, FILE_WRITE);
+  if (!logFile) return false;
+
+  logFile.println("Time,Yaw,Pitch,Roll,AccX,AccY,AccZ,Temp,Pressure,Alt,Lat,Lon,GPS_Alt,Sats");
+  logFile.close();
+  return true;
 }
 
-// 함수의 정의와 데이터 기록 순서를 요청하신 대로 변경합니다.
-bool logData(const char* filename, float yaw, float pitch, float roll, float accelX, float accelY, float accelZ, float temperature, float pressure, float altitude) {
-    File dataFile = SD.open(filename, FILE_WRITE);
-    if (dataFile) {
-        // 1. 자세 데이터
-        dataFile.print(yaw, 2); dataFile.print(",");
-        dataFile.print(pitch, 2); dataFile.print(",");
-        dataFile.print(roll, 2); dataFile.print(",");
+bool logData(const char* filename,
+             float yaw, float pitch, float roll,
+             float ax, float ay, float az,
+             float temp, float pressure, float alt,
+             double lat, double lon, double gpsAlt,
+             int sats) {
+  File logFile = SD.open(filename, FILE_WRITE);
+  if (!logFile) return false;
 
-        // 2. 가속도 데이터
-        dataFile.print(accelX, 4); dataFile.print(",");
-        dataFile.print(accelY, 4); dataFile.print(",");
-        dataFile.print(accelZ, 4); dataFile.print(",");
+  logFile.print(millis()); logFile.print(",");
+  logFile.print(yaw); logFile.print(",");
+  logFile.print(pitch); logFile.print(",");
+  logFile.print(roll); logFile.print(",");
+  logFile.print(ax); logFile.print(",");
+  logFile.print(ay); logFile.print(",");
+  logFile.print(az); logFile.print(",");
+  logFile.print(temp); logFile.print(",");
+  logFile.print(pressure); logFile.print(",");
+  logFile.print(alt); logFile.print(",");
+  logFile.print(lat, 6); logFile.print(",");
+  logFile.print(lon, 6); logFile.print(",");
+  logFile.print(gpsAlt); logFile.print(",");
+  logFile.println(sats);
 
-        // 3. 환경 데이터
-        dataFile.print(temperature, 2); dataFile.print(",");
-        dataFile.print(pressure, 2); dataFile.print(",");
-        dataFile.println(altitude, 2); // 마지막 값
-
-        dataFile.close();
-        return true;
-    }
-    return false;
+  logFile.close();
+  return true;
 }

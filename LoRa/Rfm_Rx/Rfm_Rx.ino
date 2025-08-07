@@ -8,6 +8,12 @@
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
+struct Vector3 {
+    float x;
+    float y;
+    float z;
+};
+
 void setup() {
     Serial.begin(115200);
     Serial1.begin(115200); // RYLR896 모듈과 통신
@@ -30,30 +36,42 @@ void setup() {
     rf95.setTxPower(23, false);
 }
 
+
 void loop() {
     if (rf95.available()) {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         uint8_t len = sizeof(buf);
         if (rf95.recv(buf, &len)) {
-            buf[len] = '\0';
-            String receivedData = String((char*)buf);
+        buf[len] = '\0';
+        String receivedData = String((char*)buf);
+        receivedData.trim(); // 안전하게 줄바꿈 제거
 
-            float yaw, pitch, roll, acceleration.x, acceleration.y, acceleration.z, temperature, pressure, altitude;
-            sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f,%f,%f,%f", &yaw, &pitch, &roll, &acceleration.x, &acceleration.y, &acceleration.z, &temperature, &pressure, &altitude);
+        float yaw, pitch, roll, temperature, pressure, altitude;
+        Vector3 acceleration;
 
+        int parsed = sscanf(receivedData.c_str(), "%f,%f,%f,%f,%f,%f,%f,%f,%f",
+                        &yaw, &pitch, &roll,
+                        &acceleration.x, &acceleration.y, &acceleration.z,
+                        &temperature, &pressure, &altitude);
+
+        if (parsed == 9) {
             Serial.print(yaw); Serial.print(",");
             Serial.print(pitch); Serial.print(",");
-            Serial.println(roll); Serial.print(",");
-
+            Serial.print(roll); Serial.print(",");
             Serial.print(acceleration.x); Serial.print(",");
             Serial.print(acceleration.y); Serial.print(",");
-            Serial.println(acceleration.z); Serial.print(",");
-            
+            Serial.print(acceleration.z); Serial.print(",");
             Serial.print(temperature); Serial.print(",");
             Serial.print(pressure); Serial.print(",");
-            Serial.println(altitude); Serial.print(",");
-            Serial.println();
+            Serial.print(altitude); Serial.println();
+        } else {
+            Serial.print("⚠️ 파싱 실패 (받은 항목 수: ");
+            Serial.print(parsed);
+            Serial.println(")");
+            Serial.print("Raw: "); Serial.println(receivedData);
         }
+}
+
     }
 
     // RESET 명령 전송 후에도 계속 수신

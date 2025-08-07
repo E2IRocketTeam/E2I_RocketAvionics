@@ -23,7 +23,7 @@ const int SERVO_PIN = 22;
 // --- 전역 객체 생성 ---
 RH_RF95 rf95(RFM95_CS, RFM95_INT);         // LoRa 객체
 Parachute parachute(SERVO_PIN);            // 낙하산 및 센서 통합 클래스
-GPS gps(Serial1);                           // GPS 모듈 (Serial1 사용)
+GPS gps(Serial2);                           // GPS 모듈 (Serial1 사용)
 
 // --- SD 로그 파일 이름 및 시간 기록용 변수 ---
 const char* logFilename = "flight_log.csv";

@@ -1,41 +1,27 @@
-#include <TinyGPSPlus.h>
+#include "GPS.h"
 
-// TinyGPS 객체
-TinyGPSPlus gps;
-
-// Serial2 → RX = 7번, TX = 8번
-#define gpsSerial Serial2
+// Teensy 4.1 Serial2 = RX2(8), TX2(7)
+GPS gps(Serial2);
 
 void setup() {
-  Serial.begin(115200);      // PC 출력용
-  gpsSerial.begin(9600);     // GPS 모듈 통신속도
+  Serial.begin(115200);
+  gps.begin();  // 기본 9600bps
 
-  Serial.println("GPS 테스트 시작 (핀 7:RX, 8:TX)");
+  Serial.println("=== GPS 테스트 시작 ===");
 }
 
 void loop() {
-  // GPS 데이터 수신 및 파싱
-  while (gpsSerial.available() > 0) {
-    gps.encode(gpsSerial.read());
-  }
+  gps.update();
 
-  // 위도/경도 정보 출력
-  if (gps.location.isUpdated()) {
-    Serial.print("위도: ");
-    Serial.print(gps.location.lat(), 6);
-    Serial.print(", 경도: ");
-    Serial.println(gps.location.lng(), 6);
+  if (gps.isLocationUpdated()) {
+    Serial.println("✅ GPS 데이터 수신 중...");
+    Serial.print("위도: "); Serial.println(gps.getLatitude(), 6);
+    Serial.print("경도: "); Serial.println(gps.getLongitude(), 6);
+    Serial.print("고도: "); Serial.print(gps.getAltitude()); Serial.println(" m");
+    Serial.print("위성 수: "); Serial.println(gps.getSatellites());
+    Serial.print("UTC 날짜: "); Serial.println(gps.getDate());
+    Serial.print("UTC 시간: "); Serial.println(gps.getTime());
+    Serial.println("------------------------------");
+    delay(1000);  // 1초 간격 출력
   }
-
-  // 시간 정보 출력
-  if (gps.time.isUpdated()) {
-    Serial.print("시간: ");
-    Serial.print(gps.time.hour());
-    Serial.print(":");
-    Serial.print(gps.time.minute());
-    Serial.print(":");
-    Serial.println(gps.time.second());
-  }
-
-  delay(200);  // 출력 간격
 }

@@ -8,7 +8,7 @@
 #include "BNO085.h"     // 자세 센서
 #include "BMP390.h"     // 고도/기압/온도 센서
 #include "GPS.h"        // GPS 모듈 클래스
-#include "Kalman.h"     // 칼만 필터 (필요 시 사용)
+     // 칼만 필터 (필요 시 사용)
 
 
 // --- LoRa 핀 설정 및 주파수 ---
@@ -119,11 +119,17 @@ void loop() {
   Serial.println(sats);
 
   // 8. LoRa 무선 전송 (중요 정보만 간단히 전송)
-  char message[100];
-  snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.6f,%.6f,%.2f",
-           yaw, pitch, roll, latitude, longitude, gpsAlt);
-  rf95.send((uint8_t *)message, strlen(message) + 1);
-  rf95.waitPacketSent();
+char message[150]; // 버퍼 크기를 150으로 넉넉하게 늘립니다.
+
+// snprintf 부분을 아래 코드로 완전히 교체하여 13개의 데이터를 모두 보내도록 합니다.
+snprintf(message, sizeof(message), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.6f,%.6f,%.2f,%d",
+         yaw, pitch, roll,
+         acceleration.x, acceleration.y, acceleration.z,
+         temperature, pressure, altitude,
+         latitude, longitude, gpsAlt, sats);
+
+rf95.send((uint8_t *)message, strlen(message) + 1);
+rf95.waitPacketSent();
 
   // 9. 주기 조절
   delay(10);
